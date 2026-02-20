@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>BBRI Trading Signal Expert</title>
+<title>Semi-Real-Time Multi-Saham Signal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{
@@ -20,12 +20,12 @@ border-radius:15px;
 font-size:18px;
 }
 input{
-padding:10px;
-font-size:18px;
-border-radius:8px;
+padding:8px;
+font-size:16px;
+border-radius:6px;
 border:none;
 margin:5px;
-width:150px;
+width:120px;
 text-align:center;
 }
 button{
@@ -45,74 +45,104 @@ margin-top:10px;
 </head>
 <body>
 
-<h2>BBRI Trading Signal Expert</h2>
-<p>Input harga & support BBRI → dapat keputusan BUY/SELL/WAIT</p>
+<h2>Semi-Real-Time Multi-Saham Trading Signal</h2>
+<p>Isi harga, support, resistance → Refresh sinyal kapan saja</p>
 
 <div class="card">
-<input type="number" id="price" placeholder="Harga Terakhir">
+<h3>Input Harga</h3>
+<table style="margin:auto">
+<tr><th>Saham</th><th>Harga</th><th>Support</th><th>Resistance</th></tr>
+<tr>
+<td>BBCA</td>
+<td><input type="number" id="price_BBCA" placeholder="Harga"></td>
+<td><input type="number" id="support_BBCA" placeholder="Support"></td>
+<td><input type="number" id="resistance_BBCA" placeholder="Resistance"></td>
+</tr>
+<tr>
+<td>BBRI</td>
+<td><input type="number" id="price_BBRI" placeholder="Harga"></td>
+<td><input type="number" id="support_BBRI" placeholder="Support"></td>
+<td><input type="number" id="resistance_BBRI" placeholder="Resistance"></td>
+</tr>
+<tr>
+<td>BMRI</td>
+<td><input type="number" id="price_BMRI" placeholder="Harga"></td>
+<td><input type="number" id="support_BMRI" placeholder="Support"></td>
+<td><input type="number" id="resistance_BMRI" placeholder="Resistance"></td>
+</tr>
+<tr>
+<td>TLKM</td>
+<td><input type="number" id="price_TLKM" placeholder="Harga"></td>
+<td><input type="number" id="support_TLKM" placeholder="Support"></td>
+<td><input type="number" id="resistance_TLKM" placeholder="Resistance"></td>
+</tr>
+</table>
 <br>
-<input type="number" id="support" placeholder="Support Kuat">
-<br>
-<input type="number" id="resistance" placeholder="Resistance / Target Profit">
-<br>
-<button onclick="analyze()">Hitung Signal</button>
+<button onclick="analyzeAll()">Hitung Semua Signal</button>
+<button onclick="refreshSignal()">Refresh Signal</button>
 </div>
 
 <div id="result"></div>
 
 <script>
-function analyze(){
-let price = parseFloat(document.getElementById("price").value);
-let support = parseFloat(document.getElementById("support").value);
-let resistance = parseFloat(document.getElementById("resistance").value);
+const stocks = ["BBCA","BBRI","BMRI","TLKM"];
 
-if(!price || !support || !resistance){
-alert("Isi semua field dulu");
-return;
-}
-
-// Hitung risiko
+function calculateSignal(price,support,resistance){
 let riskPercent = ((price - support)/price)*100;
-
-// Tentukan Signal
 let signal="", cls="";
 if(price <= support){
-signal="BUY";
-cls="buy";
+signal="BUY"; cls="buy";
 }else if(price >= resistance){
-signal="SELL";
-cls="sell";
+signal="SELL"; cls="sell";
 }else if(riskPercent <=3){
-signal="BUY";
-cls="buy";
+signal="BUY"; cls="buy";
 }else{
-signal="WAIT";
-cls="wait";
+signal="WAIT"; cls="wait";
 }
-
-// Tentukan Cut Loss dan Target Profit
 let cutLoss = support - 1;
 let target = resistance;
-
-// Komentar ala expert
 let comment="";
 if(signal=="BUY") comment="Trend aman, risk kecil, entry bisa dilakukan.";
 else if(signal=="SELL") comment="Harga sudah tinggi, pertimbangkan ambil profit.";
 else comment="Risk terlalu besar, tunggu kondisi lebih aman.";
+return {signal,cls,cutLoss,target,riskPercent,comment};
+}
 
-document.getElementById("result").innerHTML=`
+function analyzeAll(){
+let output="";
+for(let stock of stocks){
+let price = parseFloat(document.getElementById("price_"+stock).value);
+let support = parseFloat(document.getElementById("support_"+stock).value);
+let resistance = parseFloat(document.getElementById("resistance_"+stock).value);
+
+if(!price || !support || !resistance){
+output+=`<div class="card"><b>${stock}</b>: Isi semua field!</div>`;
+continue;
+}
+
+let res = calculateSignal(price,support,resistance);
+
+output+=`
 <div class="card">
-<b>Saham:</b> BBRI<br>
+<b>Saham:</b> ${stock}<br>
 <b>Harga Terakhir:</b> ${price}<br>
-<b>Signal:</b> <span class="${cls}">${signal}</span><br>
-<b>Cut Loss (CL):</b> ${cutLoss.toFixed(0)}<br>
-<b>Target Profit (TP):</b> ${target}<br>
-<b>Risk %:</b> ${riskPercent.toFixed(2)} %<br>
-<b>Komentar Expert:</b> ${comment}
+<b>Signal:</b> <span class="${res.cls}">${res.signal}</span><br>
+<b>Cut Loss (CL):</b> ${res.cutLoss.toFixed(0)}<br>
+<b>Target Profit (TP):</b> ${res.target}<br>
+<b>Risk %:</b> ${res.riskPercent.toFixed(2)} %<br>
+<b>Komentar Expert:</b> ${res.comment}
 </div>
 `;
+}
+document.getElementById("result").innerHTML=output;
+}
+
+// Tombol Refresh bisa hitung ulang tanpa reload page
+function refreshSignal(){
+analyzeAll();
+alert("Signal diperbarui!");
 }
 </script>
 
 </body>
-</html>
+      </html>
