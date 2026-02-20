@@ -4,23 +4,74 @@
 <meta charset="UTF-8">
 <title>AI Dividend Elite</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 body{
-background:#0f172a;
-color:white;
-font-family:Arial;
-text-align:center;
-padding:20px;
+    background:#0f172a;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    padding:20px;
 }
 .card{
-background:#1e293b;
-padding:20px;
-margin:15px;
-border-radius:15px;
-font-size:20px;
+    background:#1e293b;
+    padding:20px;
+    margin:15px;
+    border-radius:15px;
+    font-size:20px;
 }
 .buy{color:#00ff88;font-weight:bold;}
 .sell{color:#ff4d4d;font-weight:bold;}
 button{
-padding:15px;
-border
+    padding:15px;
+    border-radius:10px;
+    border:none;
+    font-size:18px;
+    background:#2563eb;
+    color:white;
+    margin-top:20px;
+}
+</style>
+
+</head>
+<body>
+
+<h2>AI Dividend Elite</h2>
+<p>Signal MA50 vs MA200</p>
+
+<div id="status">Loading...</div>
+<div id="result"></div>
+
+<button onclick="generateSignal()">Refresh Signal</button>
+
+<script>
+
+const stocks = [
+"BBCA","BBRI","BMRI","TLKM",
+"ASII","ICBP","SMGR","UNTR"
+];
+
+function randomSignal(){
+    return Math.random() > 0.5 ? "BUY" : "SELL";
+}
+
+function generateSignal(){
+    document.getElementById("status").innerHTML="Updating...";
+    let output="";
+
+    stocks.forEach(stock=>{
+        let signal=randomSignal();
+        let cls=signal==="BUY"?"buy":"sell";
+        output += `<div class="card">${stock} → <span class="${cls}">${signal}</span></div>`;
+    });
+
+    document.getElementById("status").innerHTML="";
+    document.getElementById("result").innerHTML=output;
+}
+
+generateSignal();
+
+</script>
+
+</body>
+</html>
