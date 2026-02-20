@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Trading Signal Stable</title>
+<title>BBRI Trading Signal Expert</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{
@@ -38,19 +38,22 @@ color:white;
 margin-top:10px;
 }
 .buy{color:#00ff88;font-weight:bold;}
+.sell{color:#ff4d4d;font-weight:bold;}
 .wait{color:orange;font-weight:bold;}
 .small{font-size:14px;color:#ccc;}
 </style>
 </head>
 <body>
 
-<h2>Trading Signal Pro (Stable)</h2>
-<p>Input Harga & Support</p>
+<h2>BBRI Trading Signal Expert</h2>
+<p>Input harga & support BBRI → dapat keputusan BUY/SELL/WAIT</p>
 
 <div class="card">
-<input type="number" id="price" placeholder="Harga Sekarang">
+<input type="number" id="price" placeholder="Harga Terakhir">
 <br>
 <input type="number" id="support" placeholder="Support Kuat">
+<br>
+<input type="number" id="resistance" placeholder="Resistance / Target Profit">
 <br>
 <button onclick="analyze()">Hitung Signal</button>
 </div>
@@ -58,37 +61,57 @@ margin-top:10px;
 <div id="result"></div>
 
 <script>
-
 function analyze(){
-
 let price = parseFloat(document.getElementById("price").value);
 let support = parseFloat(document.getElementById("support").value);
+let resistance = parseFloat(document.getElementById("resistance").value);
 
-if(!price || !support){
-alert("Isi harga dan support dulu");
+if(!price || !support || !resistance){
+alert("Isi semua field dulu");
 return;
 }
 
-let riskPercent = ((price - support) / price) * 100;
-let cutLoss = support - 1;
-let target = price * 1.05;
+// Hitung risiko
+let riskPercent = ((price - support)/price)*100;
 
-let signal = riskPercent <= 3 ? "BUY" : "WAIT";
-let cls = signal=="BUY" ? "buy" : "wait";
-
-document.getElementById("result").innerHTML = `
-<div class="card">
-Signal: <span class="${cls}">${signal}</span><br><br>
-Harga: ${price}<br>
-Support: ${support}<br>
-Risk: ${riskPercent.toFixed(2)} %<br>
-Cut Loss: ${cutLoss.toFixed(0)}<br>
-Target 5%: ${target.toFixed(0)}
-</div>
-`;
-
+// Tentukan Signal
+let signal="", cls="";
+if(price <= support){
+signal="BUY";
+cls="buy";
+}else if(price >= resistance){
+signal="SELL";
+cls="sell";
+}else if(riskPercent <=3){
+signal="BUY";
+cls="buy";
+}else{
+signal="WAIT";
+cls="wait";
 }
 
+// Tentukan Cut Loss dan Target Profit
+let cutLoss = support - 1;
+let target = resistance;
+
+// Komentar ala expert
+let comment="";
+if(signal=="BUY") comment="Trend aman, risk kecil, entry bisa dilakukan.";
+else if(signal=="SELL") comment="Harga sudah tinggi, pertimbangkan ambil profit.";
+else comment="Risk terlalu besar, tunggu kondisi lebih aman.";
+
+document.getElementById("result").innerHTML=`
+<div class="card">
+<b>Saham:</b> BBRI<br>
+<b>Harga Terakhir:</b> ${price}<br>
+<b>Signal:</b> <span class="${cls}">${signal}</span><br>
+<b>Cut Loss (CL):</b> ${cutLoss.toFixed(0)}<br>
+<b>Target Profit (TP):</b> ${target}<br>
+<b>Risk %:</b> ${riskPercent.toFixed(2)} %<br>
+<b>Komentar Expert:</b> ${comment}
+</div>
+`;
+}
 </script>
 
 </body>
