@@ -1,39 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Trading Signal Stable</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+text-align:center;
+padding:20px;
+}
+.card{
+background:#1e293b;
+padding:20px;
+margin:15px;
+border-radius:15px;
+font-size:18px;
+}
+input{
+padding:10px;
+font-size:18px;
+border-radius:8px;
+border:none;
+margin:5px;
+width:150px;
+text-align:center;
+}
+button{
+padding:12px;
+border-radius:10px;
+border:none;
+font-size:18px;
+background:#2563eb;
+color:white;
+margin-top:10px;
+}
+.buy{color:#00ff88;font-weight:bold;}
+.wait{color:orange;font-weight:bold;}
+.small{font-size:14px;color:#ccc;}
+</style>
+</head>
 <body>
 
-<h2>AI Dividend Elite</h2>
-<p>Signal MA50 vs MA200</p>
+<h2>Trading Signal Pro (Stable)</h2>
+<p>Input Harga & Support</p>
 
-<div id="status">Loading...</div>
+<div class="card">
+<input type="number" id="price" placeholder="Harga Sekarang">
+<br>
+<input type="number" id="support" placeholder="Support Kuat">
+<br>
+<button onclick="analyze()">Hitung Signal</button>
+</div>
+
 <div id="result"></div>
-
-<button onclick="generateSignal()">Refresh Signal</button>
 
 <script>
 
-const stocks = [
-"BBCA","BBRI","BMRI","TLKM",
-"ASII","ICBP","SMGR","UNTR"
-];
+function analyze(){
 
-function randomSignal(){
-    return Math.random() > 0.5 ? "BUY" : "SELL";
+let price = parseFloat(document.getElementById("price").value);
+let support = parseFloat(document.getElementById("support").value);
+
+if(!price || !support){
+alert("Isi harga dan support dulu");
+return;
 }
 
-function generateSignal(){
-    document.getElementById("status").innerHTML="Updating...";
-    let output="";
+let riskPercent = ((price - support) / price) * 100;
+let cutLoss = support - 1;
+let target = price * 1.05;
 
-    stocks.forEach(stock=>{
-        let signal=randomSignal();
-        let cls=signal==="BUY"?"buy":"sell";
-        output += `<div class="card">${stock} → <span class="${cls}">${signal}</span></div>`;
-    });
+let signal = riskPercent <= 3 ? "BUY" : "WAIT";
+let cls = signal=="BUY" ? "buy" : "wait";
 
-    document.getElementById("status").innerHTML="";
-    document.getElementById("result").innerHTML=output;
+document.getElementById("result").innerHTML = `
+<div class="card">
+Signal: <span class="${cls}">${signal}</span><br><br>
+Harga: ${price}<br>
+Support: ${support}<br>
+Risk: ${riskPercent.toFixed(2)} %<br>
+Cut Loss: ${cutLoss.toFixed(0)}<br>
+Target 5%: ${target.toFixed(0)}
+</div>
+`;
+
 }
-
-generateSignal();
 
 </script>
 
